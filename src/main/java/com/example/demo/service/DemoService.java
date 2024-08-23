@@ -1,60 +1,36 @@
 package com.example.demo.service;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.example.demo.entity.Country;
+import com.example.demo.entity.User;
+import com.example.demo.repository.DemoRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import java.util.List;
 
-import java.sql.*;
-
-public class DemoService {
-    //JDBC driver name and database URL
-    static final String JDBC_DRIVER = "org.h2.Driver";
-    static final String DB_URL = "jdbc:h2:~/test";
-
-    //Database credetials
-    static final String USER = "user";
-    static final String PASS = "12345";
-    public String getListOfUsers() {
-        Connection conn = null;
-        Statement stmt = null;
-        try {
-            Class.forName(JDBC_DRIVER);
-            System.out.println("Connecting to database...");
-            conn = DriverManager.getConnection(DB_URL,USER,PASS);
-            System.out.println("Connected successfully!");
-            stmt = conn.createStatement();
-            String sql = "SELECT * FROM users";
-            ResultSet rs = stmt.executeQuery(sql);
-            JSONArray json = new JSONArray();
-            ResultSetMetaData rsmd = rs.getMetaData();
-            while(rs.next()) {
-                int numColumns = rsmd.getColumnCount();
-                JSONObject obj = new JSONObject();
-                for (int i = 1; i <= numColumns; i++) {
-                    String column_name = rsmd.getColumnName(i);
-                    obj.put(column_name, rs.getObject(column_name));
-                }
-                json.put(obj);
-            }
-            conn.close();
-            return json.toString();
-        } catch(SQLException se) {
-            //Handle errors for JDBC
-            se.printStackTrace();
-        } catch(Exception e) {
-            //Handle errors for Class.forName
-            e.printStackTrace();
-        } finally {
-            //finally block used to close resources
-            try{
-                if(stmt!=null) stmt.close();
-            } catch(SQLException se2) {
-            } // nothing we can do
-            try {
-                if(conn!=null) conn.close();
-            } catch(SQLException se){
-                se.printStackTrace();
-            } //end finally try
-        } //end try
-        return null;
+@Service
+public class DemoService implements InDemoService {
+    @Autowired
+    private DemoRepository demoRepository;
+    public String getListOfUsers() throws JsonProcessingException {
+        User user = new User();
+        user.setId(1L);
+        user.setAge(20);
+        user.setFirstName("Jack");
+        user.setCountry(Country.USA);
+        demoRepository.save(user);
+        List<User> l = demoRepository.findAll();
+        for (int i = 0; i < l.size(); i++) {
+            System.out.printf("ID: " + l.get(i).getId() + ", First Name: " + l.get(i).getFirstName() + ", Country: " + l.get(i).getCountry() + ", Age: " + l.get(i).getAge() + ", Country: " + l.get(i).getCountry() + "%n");
+        }
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        String json = ow.writeValueAsString(l);
+        return json;
+    }
+    public void saveUser(User user)
+    {
+        demoRepository.save(user);
     }
 }
