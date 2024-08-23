@@ -15,6 +15,8 @@ import com.example.demo.repository.DemoRepository;
 import com.example.demo.entity.User;
 
 import java.sql.*;
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 public class DemoController {
@@ -31,7 +33,10 @@ public class DemoController {
         user.setFirstName("Jack");
         user.setCountry(Country.USA);
         demoRepository.save(user);
-        System.out.println(demoRepository.findAll());
+        List<User> l = demoRepository.findAll();
+        for (int i = 0; i < l.size(); i++) {
+            System.out.printf("ID: " + l.get(i).getId() + ", First Name: " + l.get(i).getFirstName() + ", Country: " + l.get(i).getCountry() + ", Age: " + l.get(i).getAge() + ", Country: " + l.get(i).getCountry() + "%n");
+        }
         return demoService.getListOfUsers();
     }
     @PostMapping("user-api/v1/users")

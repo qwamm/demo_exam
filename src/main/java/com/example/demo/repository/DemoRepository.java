@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface DemoRepository extends JpaRepository<User, Long>  {
     User save(User user);
     Optional<User> findById(long id);
+    List<User> findAll();
 }
