@@ -15,12 +15,6 @@ public class DemoService implements InDemoService {
     @Autowired
     private DemoRepository demoRepository;
     public String getListOfUsers() throws JsonProcessingException {
-        User user = new User();
-        user.setId(1L);
-        user.setAge(20);
-        user.setFirstName("Jack");
-        user.setCountry(Country.USA);
-        demoRepository.save(user);
         List<User> l = demoRepository.findAll();
         for (int i = 0; i < l.size(); i++) {
             System.out.printf("ID: " + l.get(i).getId() + ", First Name: " + l.get(i).getFirstName() + ", Country: " + l.get(i).getCountry() + ", Age: " + l.get(i).getAge() + ", Country: " + l.get(i).getCountry() + "%n");
@@ -32,5 +26,11 @@ public class DemoService implements InDemoService {
     public void saveUser(User user)
     {
         demoRepository.save(user);
+    }
+    public String getSortedListOfUsers(Integer age) throws JsonProcessingException {
+        List<User> l = demoRepository.findAdditionalInfo(age);
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        String json = ow.writeValueAsString(l);
+        return json;
     }
 }
